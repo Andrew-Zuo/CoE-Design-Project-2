@@ -1,4 +1,8 @@
 ###Bing Chiling Batallion - Design Project 2: Music Game
+#You are an employee at a music factory. Your job is to tune the instruments that are being produced.
+#It is promotion season and everyone is fighting for the limited spot, so you better perform well
+#It takes a lot of effort to tune to the right pitch, and your coworkers will be working to sabotage you.
+#Good luck!
 from machine import Pin, ADC, PWM, I2C
 from mfrc522 import MFRC522
 from pico_i2c_lcd import I2cLcd

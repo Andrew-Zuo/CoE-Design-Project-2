@@ -80,23 +80,23 @@ def game(level, p, s): #level - list containing scale, p - player number in list
 
 
 while True:
-    anyWin = False
-    playerList = []
-    rfidList = []
     #LDC Screen Print Introduction, later problem
     #prints first time switch is turned on, while loop runs after until turned of
     '''
     if(onOff.value() == 1):
+        playerList = []
+        rfidList = []
+        anyWin = False
         print("Welcome")
     #scan RFID, num players, create objects
-    while(button.value() == 0):
-        if(readrfid in rfidList):
-            print("Player already registered")
-        else:
-            playerList.append(player(rfid.read_id()))
-    if(rfidList.length() == 0):
-        print("No players registered, please register players")
-        continue
+        while(button.value() == 0):
+            if(readrfid in rfidList):
+                print("Player already registered")
+            else:
+                playerList.append(player(rfid.read_id()))
+        if(rfidList.length() == 0):
+            print("No players registered, please register players")
+            continue
     '''
     #main game loop
     p = 0

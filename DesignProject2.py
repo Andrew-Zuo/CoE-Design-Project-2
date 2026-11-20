@@ -14,12 +14,17 @@ onPin = 1
 buttonPin = 2
 micPin = 26
 speakerPin = 15
+sdaPin = 3
+sclPin = 4
+
 
 onOff = Pin(onPin, Pin.OUT)
 button = Pin(buttonPin, Pin.IN, Pin.PULL_DOWN)
 mic = ADC(Pin(micPin))
 speaker = PWM(Pin(speakerPin))
-
+i2c = I2C(0, sda = Pin(sdaPin), scl=Pin(sclPin), freq = 40000)
+i2cAddr = i2c.scan()[0]
+lcd = I2cLcd(i2c, i2cAddr, 2, 16)
 
 class player:
     def __init__(self, uid):
@@ -52,10 +57,16 @@ class player:
     def checkWin(self):
         return self.winCon
 
-def game(level, p, s): #level - list containing scale, p - player number in list
+def lcdType(lcd, text, delay = 0.1):
+    for i in text:
+        lcd.putstr(i)
+        sleep(delay)
+
+def game(level, playNum, s): #level - list containing scale, p - player number in list, s - speed
     #print to LCD screen
-    #player {p + 1} clocked into shift, get ready to tune this instrument
-    #here is your note, make sure you get this right
+    lcdType(lcd, f"Player {playNum + 1} clocked into shift, get ready to tune this instrument")
+    lcd.clear()
+    lcdType(lcd, "here is your note, make sure you get this right")
     correctNote = randint(0, level.length()-1)
     currNote = 0
     while(button.value() == 0):
@@ -80,14 +91,18 @@ def game(level, p, s): #level - list containing scale, p - player number in list
 
 
 while True:
-    #LDC Screen Print Introduction, later problem
     #prints first time switch is turned on, while loop runs after until turned of
-    '''
+    lcdType(lcd, """You are an employee at a music factory. Your job is to tune the instruments that are being produced.
+    It is promotion season and everyone is fighting for the limited spot, so you better perform well
+    It takes a lot of effort to tune to the right pitch, and your coworkers will be working to sabotage you.
+    Good luck!""")
+    
     if(onOff.value() == 1):
         playerList = []
         rfidList = []
         anyWin = False
         print("Welcome")
+    '''
     #scan RFID, num players, create objects
         while(button.value() == 0):
             if(readrfid in rfidList):

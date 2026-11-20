@@ -14,17 +14,27 @@ onPin = 1
 buttonPin = 2
 micPin = 26
 speakerPin = 15
+
 sdaPin = 3
 sclPin = 4
+
+sckPin = 5
+misoPin = 6
+mosiPin = 7
+csPin = 8
+rstPin = 9
 
 
 onOff = Pin(onPin, Pin.OUT)
 button = Pin(buttonPin, Pin.IN, Pin.PULL_DOWN)
 mic = ADC(Pin(micPin))
 speaker = PWM(Pin(speakerPin))
+
 i2c = I2C(0, sda = Pin(sdaPin), scl=Pin(sclPin), freq = 40000)
 i2cAddr = i2c.scan()[0]
 lcd = I2cLcd(i2c, i2cAddr, 2, 16)
+
+scanner = MFRC522(spi_id=0, sck=sckPin, miso=misoPin, mosi=mosiPin, cs=csPin, rst=rstPin)
 
 class player:
     def __init__(self, uid):
@@ -62,6 +72,20 @@ def lcdType(lcd, text, delay = 0.1):
         lcd.putstr(i)
         sleep(delay)
 
+def rfidScan(): #scan RFID, num players, create objects
+    playList = []
+    idList = []
+    scanner.init()
+    while(button.value() == 0):
+        if(rfidVal in rfidList):
+            print("Player already registered")
+        else:
+            playList.append(player(rfid.read_id()))
+    if(rfidList.length() == 0):
+        print("No players registered, please register players")
+        rfidScan()
+    return playList, idList
+
 def game(level, playNum, s): #level - list containing scale, p - player number in list, s - speed
     #print to LCD screen
     lcdType(lcd, f"Player {playNum + 1} clocked into shift, get ready to tune this instrument")
@@ -82,7 +106,7 @@ def game(level, playNum, s): #level - list containing scale, p - player number i
                     change = round(((mic.read_u16() - 50000)/1000), 3)  #tune these numbers, random guess rn
                     speed += uniform(-change, change)
                 sleep(speed/5)
-    if(currNote == correctNote):
+    if(currNote == correctNotei):
         p.changeScore(1)
         #some message
     else:
@@ -96,23 +120,13 @@ while True:
     It is promotion season and everyone is fighting for the limited spot, so you better perform well
     It takes a lot of effort to tune to the right pitch, and your coworkers will be working to sabotage you.
     Good luck!""")
-    
+
     if(onOff.value() == 1):
         playerList = []
         rfidList = []
         anyWin = False
-        print("Welcome")
-    '''
-    #scan RFID, num players, create objects
-        while(button.value() == 0):
-            if(readrfid in rfidList):
-                print("Player already registered")
-            else:
-                playerList.append(player(rfid.read_id()))
-        if(rfidList.length() == 0):
-            print("No players registered, please register players")
-            continue
-    '''
+        lcdType(lcd, "Welcome")
+    playerList, rfidList = rfidScan()
     #main game loop
     p = 0
     tot = 0

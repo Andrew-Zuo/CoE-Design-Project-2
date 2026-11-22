@@ -68,9 +68,24 @@ class player:
         return self.winCon
 
 def lcdType(lcd, text, delay = 0.1):
-    for i in text:
-        lcd.putstr(i)
-        sleep(delay)
+    list =  text.split(' ')
+    count = 0
+    length = 0
+    line = 0
+    while count < len(list):
+        word = list[count]
+        length = length + len(word) + 1
+        if length > 16:
+            if line == 0:
+                lcd.move_to(0,1)
+            else:
+                lcd.move_to(0,0)
+            length = 0
+        for i in word:
+            lcd.putstr(i)
+            sleep(delay)
+        lcd.putstr(' ')
+        count +=1
 
 def rfidScan(): #scan RFID, num players, create objects
     playList = []
